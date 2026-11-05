@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TechSpace - Explore technology, innovation, cybersecurity, artificial intelligence and software development.">
+    <title>TechSpace | Technology, Innovation & Ideas</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="navbar container">
+        <a href="index.html" class="logo">Tech<span>Space</span></a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+            ☰
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html" class="active">Home</a>
+            <a href="#articles">Explore</a>
+            <a href="login.html" id="loginNav">Login</a>
+            <a href="register.html" class="nav-button" id="registerNav">Get Started</a>
+            <a href="dashboard.html" id="dashboardNav" hidden>Dashboard</a>
+            <button class="logout-button" id="logoutNav" hidden>Logout</button>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <span class="eyebrow">TECHNOLOGY • INNOVATION • KNOWLEDGE</span>
+
+                <h1>Explore Ideas That Shape the <span>Digital Future.</span></h1>
+
+                <p>
+                    Discover useful technology insights, learn about emerging
+                    innovations and share your knowledge with a growing community
+                    of technology enthusiasts.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#articles" class="btn btn-primary">Explore Articles</a>
+                    <a href="register.html" class="btn btn-outline">Start Writing</a>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <img
+                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=85"
+                    alt="Technology professionals working together"
+                >
+            </div>
+        </div>
+    </section>
+
+    <section class="featured-section container">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">EDITOR'S PICK</span>
+                <h2>Featured Article</h2>
+            </div>
+        </div>
+
+        <article class="featured-card">
+            <img
+                src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1000&q=85"
+                alt="Artificial intelligence concept"
+            >
+
+            <div class="featured-content">
+                <span class="category-tag">Artificial Intelligence</span>
+                <h3>Understanding Artificial Intelligence and Its Impact on Modern Society</h3>
+
+                <p>
+                    Artificial intelligence is changing how people work, learn
+                    and communicate. From virtual assistants to intelligent
+                    recommendation systems, AI is becoming an important part
+                    of everyday technology.
+                </p>
+
+                <a href="#articles" class="text-link">Explore technology articles →</a>
+            </div>
+        </article>
+    </section>
+
+    <section class="articles-section container" id="articles">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">KNOWLEDGE AND DISCOVERY</span>
+                <h2>Latest Articles</h2>
+                <p>Explore ideas, tutorials and insights from the technology world.</p>
+            </div>
+        </div>
+
+        <div class="article-grid" id="homeArticles">
+
+            <article class="article-card">
+                <img
+                    src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=800&q=85"
+                    alt="Computer programming"
+                >
+                <div class="article-content">
+                    <span class="category-tag">Web Development</span>
+                    <h3>Getting Started with Modern Web Development</h3>
+                    <p>
+                        Learn how HTML, CSS and JavaScript work together
+                        to create interactive websites.
+                    </p>
+                    <span class="article-meta">Technology • 5 min read</span>
+                </div>
+            </article>
+
+            <article class="article-card">
+                <img
+                    src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=85"
+                    alt="Cybersecurity technology"
+                >
+                <div class="article-content">
+                    <span class="category-tag">Cybersecurity</span>
+                    <h3>Why Cybersecurity Matters in the Digital Age</h3>
+                    <p>
+                        Discover practical ways individuals and businesses
+                        can protect their digital information.
+                    </p>
+                    <span class="article-meta">Security • 6 min read</span>
+                </div>
+            </article>
+
+            <article class="article-card">
+                <img
+                    src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=85"
+                    alt="Electronic computer components"
+                >
+                <div class="article-content">
+                    <span class="category-tag">Computer Science</span>
+                    <h3>Understanding Computer Hardware Components</h3>
+                    <p>
+                        Explore the essential components that allow
+                        computers to process and store information.
+                    </p>
+                    <span class="article-meta">Computing • 4 min read</span>
+                </div>
+            </article>
+
+            <article class="article-card">
+                <img
+                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=85"
+                    alt="Cloud computing workspace"
+                >
+                <div class="article-content">
+                    <span class="category-tag">Cloud Computing</span>
+                    <h3>How Cloud Computing Is Changing Businesses</h3>
+                    <p>
+                        Understand how cloud platforms help organizations
+                        store data and access computing resources.
+                    </p>
+                    <span class="article-meta">Cloud • 5 min read</span>
+                </div>
+            </article>
+
+            <article class="article-card">
+                <img
+                    src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9a?auto=format&fit=crop&w=800&q=85"
+                    alt="Smartphone technology"
+                >
+                <div class="article-content">
+                    <span class="category-tag">Mobile Technology</span>
+                    <h3>The Role of Smartphones in Modern Communication</h3>
+                    <p>
+                        Learn how mobile technology has transformed
+                        communication, education and business.
+                    </p>
+                    <span class="article-meta">Mobile • 4 min read</span>
+                </div>
+            </article>
+
+            <article class="article-card">
+                <img
+                    src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=85"
+                    alt="Digital global network"
+                >
+                <div class="article-content">
+                    <span class="category-tag">Technology</span>
+                    <h3>Emerging Technology Trends to Watch</h3>
+                    <p>
+                        Explore developments in automation, connected
+                        devices and digital infrastructure.
+                    </p>
+                    <span class="article-meta">Innovation • 5 min read</span>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <section class="categories-section">
+        <div class="container">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">EXPLORE YOUR INTERESTS</span>
+                    <h2>Popular Categories</h2>
+                </div>
+            </div>
+
+            <div class="category-grid">
+                <div class="category-box">Artificial Intelligence</div>
+                <div class="category-box">Cybersecurity</div>
+                <div class="category-box">Web Development</div>
+                <div class="category-box">Cloud Computing</div>
+                <div class="category-box">Software Engineering</div>
+                <div class="category-box">Mobile Technology</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section container">
+        <h2>Have Something Valuable to Share?</h2>
+        <p>
+            Join TechSpace and publish your ideas, experiences and
+            technology knowledge.
+        </p>
+        <a href="register.html" class="btn btn-primary">Create Your Account</a>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-content">
+        <div>
+            <a href="index.html" class="logo footer-logo">Tech<span>Space</span></a>
+            <p>Technology, Innovation and Ideas.</p>
+        </div>
+
+        <p>&copy; <span class="current-year"></span> TechSpace. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

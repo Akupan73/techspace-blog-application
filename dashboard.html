@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | TechSpace</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="navbar container">
+        <a href="index.html" class="logo">Tech<span>Space</span></a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="create-blog.html" class="nav-button">Create Article</a>
+            <button class="logout-button" id="logoutButton">Logout</button>
+        </div>
+    </nav>
+</header>
+
+<main class="dashboard-section container">
+
+    <div class="dashboard-heading">
+        <div>
+            <span class="eyebrow">YOUR WORKSPACE</span>
+            <h1>Welcome, <span id="dashboardUser">Writer</span>!</h1>
+            <p>Manage your articles and share new ideas with the community.</p>
+        </div>
+
+        <a href="create-blog.html" class="btn btn-primary">+ Create New Article</a>
+    </div>
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+            <span>Total Articles</span>
+            <h2 id="totalArticles">0</h2>
+            <p>All your articles</p>
+        </div>
+
+        <div class="stat-card">
+            <span>Published</span>
+            <h2 id="publishedArticles">0</h2>
+            <p>Available to readers</p>
+        </div>
+
+        <div class="stat-card">
+            <span>Drafts</span>
+            <h2 id="draftArticles">0</h2>
+            <p>Saved for later</p>
+        </div>
+
+    </section>
+
+    <section class="dashboard-articles">
+        <div class="section-heading">
+            <div>
+                <h2>My Articles</h2>
+                <p>View and manage your published articles and drafts.</p>
+            </div>
+        </div>
+
+        <div id="dashboardArticles" class="dashboard-article-list">
+            <!-- JavaScript displays the user's articles here. -->
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-content">
+        <p>&copy; <span class="current-year"></span> TechSpace. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

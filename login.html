@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TechSpace</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="navbar container">
+        <a href="index.html" class="logo">Tech<span>Space</span></a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="register.html" class="nav-button">Create Account</a>
+        </div>
+    </nav>
+</header>
+
+<main class="auth-section">
+    <div class="auth-card">
+        <div class="auth-heading">
+            <span class="eyebrow">WELCOME BACK</span>
+            <h1>Login to TechSpace</h1>
+            <p>Access your account and continue sharing ideas.</p>
+        </div>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="Enter your email address"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                Login to Account
+            </button>
+
+            <p id="loginMessage" class="form-message"></p>
+
+        </form>
+
+        <p class="auth-footer">
+            Don't have an account?
+            <a href="register.html">Register here</a>
+        </p>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-content">
+        <p>&copy; <span class="current-year"></span> TechSpace. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>
