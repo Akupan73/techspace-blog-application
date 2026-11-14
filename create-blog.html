@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Create and publish technology articles on TechSpace.">
+
+    <title>Create Article | TechSpace</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="site-header">
+
+        <div class="container navbar">
+
+            <a href="index.html" class="logo">
+                Tech<span>Space</span>
+            </a>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+                ☰
+            </button>
+
+            <div class="nav-links" id="navLinks">
+
+                <a href="index.html">Home</a>
+
+                <a href="dashboard.html">Dashboard</a>
+
+                <a href="create-blog.html" class="active">
+                    Create Article
+                </a>
+
+                <button class="logout-button" id="logoutNav">
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- Article Editor -->
+    <main>
+
+        <section class="editor-section container">
+
+            <div class="editor-heading">
+
+                <span class="eyebrow">SHARE YOUR KNOWLEDGE</span>
+
+                <h1 id="editorTitle">Create New Article</h1>
+
+                <p>
+                    Share your thoughts, discoveries and ideas
+                    with the TechSpace community.
+                </p>
+
+            </div>
+
+
+            <div class="editor-card">
+
+                <form id="blogForm">
+
+                    <!-- Article Title -->
+                    <div class="form-group">
+
+                        <label for="blogTitle">
+                            Article Title
+                        </label>
+
+                        <input
+                            type="text"
+                            id="blogTitle"
+                            placeholder="Enter your article title"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Category -->
+                    <div class="form-group">
+
+                        <label for="blogCategory">
+                            Category
+                        </label>
+
+                        <select id="blogCategory" required>
+
+                            <option value="">Select a category</option>
+
+                            <option value="Technology">Technology</option>
+
+                            <option value="Artificial Intelligence">
+                                Artificial Intelligence
+                            </option>
+
+                            <option value="Cybersecurity">
+                                Cybersecurity
+                            </option>
+
+                            <option value="Software Development">
+                                Software Development
+                            </option>
+
+                            <option value="Web Development">
+                                Web Development
+                            </option>
+
+                            <option value="Programming">
+                                Programming
+                            </option>
+
+                            <option value="Innovation">
+                                Innovation
+                            </option>
+
+                            <option value="Digital Transformation">
+                                Digital Transformation
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Featured Image -->
+                    <div class="form-group">
+
+                        <label for="blogImage">
+                            Featured Image URL (Optional)
+                        </label>
+
+                        <input
+                            type="url"
+                            id="blogImage"
+                            placeholder="https://example.com/image.jpg"
+                        >
+
+                    </div>
+
+
+                    <!-- Article Excerpt -->
+                    <div class="form-group">
+
+                        <label for="blogExcerpt">
+                            Short Description
+                        </label>
+
+                        <textarea
+                            id="blogExcerpt"
+                            rows="3"
+                            maxlength="300"
+                            placeholder="Write a short introduction to your article..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- Article Content -->
+                    <div class="form-group">
+
+                        <label for="blogContent">
+                            Article Content
+                        </label>
+
+                        <textarea
+                            id="blogContent"
+                            rows="12"
+                            placeholder="Write your complete article here..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- Action Buttons -->
+                    <div class="editor-actions">
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="draft"
+                            class="btn btn-outline"
+                        >
+                            Save as Draft
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="publish"
+                            class="btn btn-primary"
+                        >
+                            Publish Article
+                        </button>
+
+                    </div>
+
+
+                    <!-- Feedback Message -->
+                    <p
+                        id="blogMessage"
+                        class="form-message"
+                        aria-live="polite"
+                    ></p>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="site-footer">
+
+        <div class="container footer-content">
+
+            <div>
+
+                <a href="index.html" class="logo footer-logo">
+                    Tech<span>Space</span>
+                </a>
+
+                <p>
+                    Technology, Innovation & Ideas.
+                </p>
+
+            </div>
+
+            <p>
+                &copy; <span class="current-year"></span>
+                TechSpace. All rights reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

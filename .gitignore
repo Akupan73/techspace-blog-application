@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Authentication test tokens
+backend/token.txt
+
+# Local backup files
+js/script_backup.js
+
+# System files
+.DS_Store
+Thumbs.db
+!backend/.env.example

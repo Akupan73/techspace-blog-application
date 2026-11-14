@@ -1,37 +1,108 @@
-/* =================================
+/* =========================================
    TECHSPACE BLOG APPLICATION
-   Vanilla JavaScript
-================================= */
+   Full-Stack Frontend JavaScript
+   Backend: Node.js + Express + SQLite
+========================================= */
 
 
-/* =================================
-   LOCAL STORAGE HELPERS
-================================= */
+/* =========================================
+   API CONFIGURATION
+========================================= */
 
-function getUsers() {
-    return JSON.parse(localStorage.getItem("techspaceUsers")) || [];
+const API_URL = "http://localhost:5000/api";
+
+
+/* =========================================
+   AUTHENTICATION HELPERS
+========================================= */
+
+// Get the saved authentication token.
+function getToken() {
+    return localStorage.getItem("techspaceToken");
 }
 
-function getArticles() {
-    return JSON.parse(localStorage.getItem("techspaceArticles")) || [];
+
+// Save authentication token.
+function saveToken(token) {
+    localStorage.setItem("techspaceToken", token);
 }
 
-function saveUsers(users) {
-    localStorage.setItem("techspaceUsers", JSON.stringify(users));
+
+// Remove authentication token and user information.
+function clearAuthentication() {
+    localStorage.removeItem("techspaceToken");
+    localStorage.removeItem("techspaceCurrentUser");
 }
 
-function saveArticles(articles) {
-    localStorage.setItem("techspaceArticles", JSON.stringify(articles));
-}
 
+// Get the currently logged-in user.
 function getCurrentUser() {
     return JSON.parse(localStorage.getItem("techspaceCurrentUser"));
 }
 
 
-/* =================================
+// Save the current user's public information.
+function saveCurrentUser(user) {
+    localStorage.setItem("techspaceCurrentUser", JSON.stringify(user));
+}
+
+
+/* =========================================
+   API REQUEST HELPER
+========================================= */
+
+async function apiRequest(endpoint, options = {}) {
+
+    const headers = {
+        "Content-Type": "application/json",
+        ...options.headers
+    };
+
+    const token = getToken();
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
+
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            if (response.status === 401 || response.status === 403) {
+                clearAuthentication();
+            }
+
+            throw new Error(data.message || "Something went wrong.");
+
+        }
+
+        return data;
+
+    } catch (error) {
+
+        if (error instanceof TypeError) {
+            throw new Error(
+                "Unable to connect to the server. Please check your internet connection or backend server."
+            );
+        }
+
+        throw error;
+
+    }
+
+}
+
+
+/* =========================================
    GENERAL PAGE FUNCTIONS
-================================= */
+========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -45,15 +116,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const navLinks = document.getElementById("navLinks");
 
     if (menuToggle && navLinks) {
+
         menuToggle.addEventListener("click", function () {
             navLinks.classList.toggle("open");
         });
+
     }
 
-    // Update navigation depending on login status.
-    updateNavigation();
-
     // Run page-specific functions.
+    updateNavigation();
     handleRegistration();
     handleLogin();
     handleLogout();
@@ -64,36 +135,95 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-/* =================================
+/* =========================================
    NAVIGATION
-================================= */
+========================================= */
 
 function updateNavigation() {
 
-    const user = getCurrentUser();
+    const token = getToken();
 
     const loginNav = document.getElementById("loginNav");
     const registerNav = document.getElementById("registerNav");
     const dashboardNav = document.getElementById("dashboardNav");
     const logoutNav = document.getElementById("logoutNav");
 
-    if (user) {
+    if (token) {
+
         if (loginNav) loginNav.hidden = true;
         if (registerNav) registerNav.hidden = true;
         if (dashboardNav) dashboardNav.hidden = false;
         if (logoutNav) logoutNav.hidden = false;
+
     } else {
+
         if (loginNav) loginNav.hidden = false;
         if (registerNav) registerNav.hidden = false;
         if (dashboardNav) dashboardNav.hidden = true;
         if (logoutNav) logoutNav.hidden = true;
+
     }
+
 }
 
 
-/* =================================
+/* =========================================
+   MESSAGE DISPLAY
+========================================= */
+
+function showMessage(element, message, type) {
+
+    if (!element) return;
+
+    element.textContent = message;
+    element.className = "form-message " + type;
+
+}
+
+
+/* =========================================
+   DATE FORMATTING
+========================================= */
+
+function formatDate(date) {
+
+    if (!date) return "Date unavailable";
+
+    return new Date(date).toLocaleDateString("en", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+    });
+
+}
+
+
+/* =========================================
+   BASIC HTML ESCAPING
+========================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "").replace(/[&<>"']/g, function (character) {
+
+        const characters = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        };
+
+        return characters[character];
+
+    });
+
+}
+
+
+/* =========================================
    USER REGISTRATION
-================================= */
+========================================= */
 
 function handleRegistration() {
 
@@ -101,7 +231,7 @@ function handleRegistration() {
 
     if (!form) return;
 
-    form.addEventListener("submit", function (event) {
+    form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
@@ -117,48 +247,50 @@ function handleRegistration() {
             return;
         }
 
-        if (password.length < 6) {
-            showMessage(message, "Password must contain at least 6 characters.", "error");
+        if (password.length < 8) {
+            showMessage(message, "Password must contain at least 8 characters.", "error");
             return;
         }
 
-        const users = getUsers();
+        try {
 
-        const existingUser = users.find(function (user) {
-            return user.email === email;
-        });
+            showMessage(message, "Creating your account...", "success");
 
-        if (existingUser) {
-            showMessage(message, "An account with this email already exists.", "error");
-            return;
+            const data = await apiRequest("/auth/register", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    password: password
+                })
+            });
+
+            showMessage(
+                message,
+                data.message + " Redirecting to login...",
+                "success"
+            );
+
+            form.reset();
+
+            setTimeout(function () {
+                window.location.href = "login.html";
+            }, 1500);
+
+        } catch (error) {
+
+            showMessage(message, error.message, "error");
+
         }
-
-        const newUser = {
-            id: Date.now().toString(),
-            name: name,
-            email: email,
-            password: password
-        };
-
-        users.push(newUser);
-        saveUsers(users);
-
-        showMessage(message, "Account created successfully! Redirecting to login...", "success");
-
-        form.reset();
-
-        setTimeout(function () {
-            window.location.href = "login.html";
-        }, 1500);
 
     });
 
 }
 
 
-/* =================================
+/* =========================================
    USER LOGIN
-================================= */
+========================================= */
 
 function handleLogin() {
 
@@ -166,7 +298,7 @@ function handleLogin() {
 
     if (!form) return;
 
-    form.addEventListener("submit", function (event) {
+    form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
@@ -175,39 +307,48 @@ function handleLogin() {
 
         const message = document.getElementById("loginMessage");
 
-        const users = getUsers();
+        try {
 
-        const user = users.find(function (item) {
-            return item.email === email && item.password === password;
-        });
+            showMessage(message, "Logging in...", "success");
 
-        if (!user) {
-            showMessage(message, "Invalid email address or password.", "error");
-            return;
+            const data = await apiRequest("/auth/login", {
+                method: "POST",
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+
+            // Save authentication token.
+            saveToken(data.token);
+
+            // Save public user information.
+            saveCurrentUser(data.user);
+
+            showMessage(
+                message,
+                "Login successful! Redirecting to dashboard...",
+                "success"
+            );
+
+            setTimeout(function () {
+                window.location.href = "dashboard.html";
+            }, 1000);
+
+        } catch (error) {
+
+            showMessage(message, error.message, "error");
+
         }
-
-        const loggedInUser = {
-            id: user.id,
-            name: user.name,
-            email: user.email
-        };
-
-        localStorage.setItem("techspaceCurrentUser", JSON.stringify(loggedInUser));
-
-        showMessage(message, "Login successful! Redirecting to dashboard...", "success");
-
-        setTimeout(function () {
-            window.location.href = "dashboard.html";
-        }, 1000);
 
     });
 
 }
 
 
-/* =================================
+/* =========================================
    LOGOUT
-================================= */
+========================================= */
 
 function handleLogout() {
 
@@ -219,7 +360,7 @@ function handleLogout() {
 
         button.addEventListener("click", function () {
 
-            localStorage.removeItem("techspaceCurrentUser");
+            clearAuthentication();
 
             window.location.href = "index.html";
 
@@ -230,34 +371,51 @@ function handleLogout() {
 }
 
 
-/* =================================
+/* =========================================
    PROTECT PRIVATE PAGES
-================================= */
+========================================= */
 
-function requireLogin() {
+async function requireLogin() {
 
-    const user = getCurrentUser();
+    const token = getToken();
 
-    if (!user) {
+    if (!token) {
         window.location.href = "login.html";
         return null;
     }
 
-    return user;
+    try {
+
+        const data = await apiRequest("/auth/me");
+
+        saveCurrentUser(data.user);
+
+        return data.user;
+
+    } catch (error) {
+
+        clearAuthentication();
+
+        window.location.href = "login.html";
+
+        return null;
+
+    }
+
 }
 
 
-/* =================================
+/* =========================================
    DASHBOARD
-================================= */
+========================================= */
 
-function handleDashboard() {
+async function handleDashboard() {
 
     const dashboardContainer = document.getElementById("dashboardArticles");
 
     if (!dashboardContainer) return;
 
-    const user = requireLogin();
+    const user = await requireLogin();
 
     if (!user) return;
 
@@ -267,106 +425,138 @@ function handleDashboard() {
         dashboardUser.textContent = user.name;
     }
 
-    displayDashboardArticles(user);
+    await displayDashboardArticles();
 
 }
 
 
-function displayDashboardArticles(user) {
+/* =========================================
+   DISPLAY DASHBOARD ARTICLES
+========================================= */
+
+async function displayDashboardArticles() {
 
     const container = document.getElementById("dashboardArticles");
 
     if (!container) return;
 
-    const articles = getArticles();
+    try {
 
-    const userArticles = articles.filter(function (article) {
-        return article.authorId === user.id;
-    });
+        container.innerHTML = "<p>Loading your articles...</p>";
 
-    const published = userArticles.filter(function (article) {
-        return article.status === "published";
-    });
+        const data = await apiRequest("/blogs/my-blogs");
 
-    const drafts = userArticles.filter(function (article) {
-        return article.status === "draft";
-    });
+        const articles = data.blogs || [];
 
-    document.getElementById("totalArticles").textContent = userArticles.length;
-    document.getElementById("publishedArticles").textContent = published.length;
-    document.getElementById("draftArticles").textContent = drafts.length;
+        const published = articles.filter(function (article) {
+            return article.status === "published";
+        });
 
-    if (userArticles.length === 0) {
+        const drafts = articles.filter(function (article) {
+            return article.status === "draft";
+        });
+
+        document.getElementById("totalArticles").textContent = articles.length;
+
+        document.getElementById("publishedArticles").textContent = published.length;
+
+        document.getElementById("draftArticles").textContent = drafts.length;
+
+
+        if (articles.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>No articles yet</h3>
+
+                    <p>
+                        You have not created any articles.
+                        Start sharing your ideas today.
+                    </p>
+
+                    <br>
+
+                    <a href="create-blog.html" class="btn btn-primary">
+                        Create Your First Article
+                    </a>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        container.innerHTML = articles.map(function (article) {
+
+            const statusClass = article.status === "draft" ? "draft" : "";
+
+            return `
+                <div class="dashboard-article">
+
+                    <div>
+
+                        <h3>${escapeHTML(article.title)}</h3>
+
+                        <p>
+                            ${escapeHTML(article.category)}
+                            • ${formatDate(article.created_at)}
+                        </p>
+
+                        <span class="article-status ${statusClass}">
+                            ${article.status === "published" ? "Published" : "Draft"}
+                        </span>
+
+                    </div>
+
+                    <div class="article-actions">
+
+                        <button
+                            class="small-button edit-button"
+                            onclick="editArticle(${Number(article.id)})">
+                            Edit
+                        </button>
+
+                        <button
+                            class="small-button delete-button"
+                            onclick="deleteArticle(${Number(article.id)})">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } catch (error) {
 
         container.innerHTML = `
             <div class="empty-state">
-                <h3>No articles yet</h3>
-                <p>You have not created any articles. Start sharing your ideas today.</p>
-                <br>
-                <a href="create-blog.html" class="btn btn-primary">
-                    Create Your First Article
-                </a>
+                <p>${escapeHTML(error.message)}</p>
+                <button class="btn btn-primary" onclick="displayDashboardArticles()">
+                    Try Again
+                </button>
             </div>
         `;
 
-        return;
     }
-
-    container.innerHTML = userArticles.map(function (article) {
-
-        const statusClass = article.status === "draft" ? "draft" : "";
-
-        return `
-            <div class="dashboard-article">
-
-                <div>
-                    <h3>${escapeHTML(article.title)}</h3>
-
-                    <p>
-                        ${escapeHTML(article.category)}
-                        • ${formatDate(article.date)}
-                    </p>
-
-                    <span class="article-status ${statusClass}">
-                        ${article.status === "published" ? "Published" : "Draft"}
-                    </span>
-                </div>
-
-                <div class="article-actions">
-
-                    <button
-                        class="small-button edit-button"
-                        onclick="editArticle('${article.id}')">
-                        Edit
-                    </button>
-
-                    <button
-                        class="small-button delete-button"
-                        onclick="deleteArticle('${article.id}')">
-                        Delete
-                    </button>
-
-                </div>
-
-            </div>
-        `;
-
-    }).join("");
 
 }
 
 
-/* =================================
+/* =========================================
    CREATE AND EDIT ARTICLES
-================================= */
+========================================= */
 
-function handleBlogForm() {
+async function handleBlogForm() {
 
     const form = document.getElementById("blogForm");
 
     if (!form) return;
 
-    const user = requireLogin();
+    const user = await requireLogin();
 
     if (!user) return;
 
@@ -375,116 +565,147 @@ function handleBlogForm() {
 
     let existingArticle = null;
 
+    const message = document.getElementById("blogMessage");
+
+
+    // Load existing article when editing.
     if (editId) {
 
-        const articles = getArticles();
+        try {
 
-        existingArticle = articles.find(function (article) {
-            return article.id === editId && article.authorId === user.id;
-        });
+            const data = await apiRequest("/blogs/my-blogs");
 
-        if (!existingArticle) {
-            alert("Article not found.");
-            window.location.href = "dashboard.html";
+            const articles = data.blogs || [];
+
+            existingArticle = articles.find(function (article) {
+                return String(article.id) === String(editId);
+            });
+
+            if (!existingArticle) {
+
+                alert("Article not found.");
+
+                window.location.href = "dashboard.html";
+
+                return;
+
+            }
+
+            document.getElementById("editorTitle").textContent = "Edit Article";
+
+            document.getElementById("blogTitle").value = existingArticle.title;
+
+            document.getElementById("blogCategory").value = existingArticle.category;
+
+            document.getElementById("blogImage").value = existingArticle.image || "";
+
+            document.getElementById("blogExcerpt").value = existingArticle.excerpt || "";
+
+            document.getElementById("blogContent").value = existingArticle.content;
+
+        } catch (error) {
+
+            showMessage(message, error.message, "error");
+
             return;
+
         }
-
-        document.getElementById("editorTitle").textContent = "Edit Article";
-
-        document.getElementById("blogTitle").value = existingArticle.title;
-        document.getElementById("blogCategory").value = existingArticle.category;
-        document.getElementById("blogImage").value = existingArticle.image || "";
-        document.getElementById("blogExcerpt").value = existingArticle.excerpt;
-        document.getElementById("blogContent").value = existingArticle.content;
 
     }
 
-    form.addEventListener("submit", function (event) {
+
+    // Submit article form.
+    form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
         const title = document.getElementById("blogTitle").value.trim();
+
         const category = document.getElementById("blogCategory").value;
+
         const image = document.getElementById("blogImage").value.trim();
+
         const excerpt = document.getElementById("blogExcerpt").value.trim();
+
         const content = document.getElementById("blogContent").value.trim();
 
-        const message = document.getElementById("blogMessage");
-
         const submitter = event.submitter;
+
         const action = submitter ? submitter.value : "publish";
-
-        if (!title || !category || !excerpt || !content) {
-            showMessage(message, "Please complete all required fields.", "error");
-            return;
-        }
-
-        const articles = getArticles();
 
         const status = action === "draft" ? "draft" : "published";
 
-        if (existingArticle) {
 
-            const articleIndex = articles.findIndex(function (article) {
-                return article.id === existingArticle.id &&
-                       article.authorId === user.id;
-            });
+        if (!title || !category || !excerpt || !content) {
 
-            if (articleIndex === -1) {
-                showMessage(message, "Article could not be found.", "error");
-                return;
-            }
+            showMessage(message, "Please complete all required fields.", "error");
 
-            articles[articleIndex] = {
-                ...articles[articleIndex],
-                title: title,
-                category: category,
-                image: image,
-                excerpt: excerpt,
-                content: content,
-                status: status,
-                updatedAt: new Date().toISOString()
-            };
-
-        } else {
-
-            const newArticle = {
-                id: Date.now().toString(),
-                authorId: user.id,
-                author: user.name,
-                title: title,
-                category: category,
-                image: image,
-                excerpt: excerpt,
-                content: content,
-                status: status,
-                date: new Date().toISOString()
-            };
-
-            articles.unshift(newArticle);
+            return;
 
         }
 
-        saveArticles(articles);
 
-        showMessage(
-            message,
-            status === "published" ? "Article published successfully!" : "Draft saved successfully!",
-            "success"
-        );
+        const articleData = {
+            title: title,
+            category: category,
+            image: image,
+            excerpt: excerpt,
+            content: content,
+            status: status
+        };
 
-        setTimeout(function () {
-            window.location.href = "dashboard.html";
-        }, 1000);
+
+        try {
+
+            showMessage(message, "Saving your article...", "success");
+
+            if (existingArticle) {
+
+                // Update existing article.
+                await apiRequest(`/blogs/${existingArticle.id}`, {
+                    method: "PUT",
+                    body: JSON.stringify(articleData)
+                });
+
+            } else {
+
+                // Create new article.
+                await apiRequest("/blogs", {
+                    method: "POST",
+                    body: JSON.stringify(articleData)
+                });
+
+            }
+
+
+            showMessage(
+                message,
+                status === "published"
+                    ? "Article published successfully!"
+                    : "Draft saved successfully!",
+                "success"
+            );
+
+            form.reset();
+
+            setTimeout(function () {
+                window.location.href = "dashboard.html";
+            }, 1000);
+
+        } catch (error) {
+
+            showMessage(message, error.message, "error");
+
+        }
 
     });
 
 }
 
 
-/* =================================
+/* =========================================
    EDIT ARTICLE
-================================= */
+========================================= */
 
 function editArticle(id) {
 
@@ -493,143 +714,108 @@ function editArticle(id) {
 }
 
 
-/* =================================
+/* =========================================
    DELETE ARTICLE
-================================= */
+========================================= */
 
-function deleteArticle(id) {
+async function deleteArticle(id) {
 
-    const user = getCurrentUser();
+    if (!getToken()) {
 
-    if (!user) {
         window.location.href = "login.html";
+
         return;
+
     }
 
-    const confirmDelete = confirm("Are you sure you want to delete this article?");
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this article?"
+    );
 
     if (!confirmDelete) return;
 
-    const articles = getArticles();
 
-    const updatedArticles = articles.filter(function (article) {
+    try {
 
-        return !(article.id === id && article.authorId === user.id);
+        await apiRequest(`/blogs/${id}`, {
+            method: "DELETE"
+        });
 
-    });
+        await displayDashboardArticles();
 
-    saveArticles(updatedArticles);
+    } catch (error) {
 
-    displayDashboardArticles(user);
+        alert(error.message);
+
+    }
 
 }
 
 
-/* =================================
+/* =========================================
    DISPLAY ARTICLES ON HOMEPAGE
-================================= */
+========================================= */
 
-function displayHomeArticles() {
+async function displayHomeArticles() {
 
     const container = document.getElementById("homeArticles");
 
     if (!container) return;
 
-    const articles = getArticles();
+    try {
 
-    const publishedArticles = articles.filter(function (article) {
-        return article.status === "published";
-    });
+        const data = await apiRequest("/blogs");
 
-    if (publishedArticles.length === 0) return;
+        const articles = data.blogs || [];
 
-    const userArticleHTML = publishedArticles.map(function (article) {
-
-        const image = article.image ||
-            "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=85";
-
-        return `
-            <article class="article-card">
-
-                <img
-                    src="${escapeHTML(image)}"
-                    alt="${escapeHTML(article.title)}"
-                    onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=85'"
-                >
-
-                <div class="article-content">
-
-                    <span class="category-tag">
-                        ${escapeHTML(article.category)}
-                    </span>
-
-                    <h3>${escapeHTML(article.title)}</h3>
-
-                    <p>${escapeHTML(article.excerpt)}</p>
-
-                    <span class="article-meta">
-                        By ${escapeHTML(article.author)} • ${formatDate(article.date)}
-                    </span>
-
-                </div>
-
-            </article>
-        `;
-
-    }).join("");
-
-    container.insertAdjacentHTML("afterbegin", userArticleHTML);
-
-}
+        if (articles.length === 0) return;
 
 
-/* =================================
-   MESSAGE DISPLAY
-================================= */
+        const userArticleHTML = articles.map(function (article) {
 
-function showMessage(element, message, type) {
+            const image = article.image ||
+                "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=85";
 
-    if (!element) return;
+            return `
+                <article class="article-card">
 
-    element.textContent = message;
-    element.className = "form-message " + type;
+                    <img
+                        src="${escapeHTML(image)}"
+                        alt="${escapeHTML(article.title)}"
+                        onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=85'"
+                    >
 
-}
+                    <div class="article-content">
+
+                        <span class="category-tag">
+                            ${escapeHTML(article.category)}
+                        </span>
+
+                        <h3>${escapeHTML(article.title)}</h3>
+
+                        <p>${escapeHTML(article.excerpt || "")}</p>
+
+                        <span class="article-meta">
+                            By ${escapeHTML(article.author_name || "TechSpace Author")}
+                            • ${formatDate(article.created_at)}
+                        </span>
+
+                    </div>
+
+                </article>
+            `;
+
+        }).join("");
 
 
-/* =================================
-   DATE FORMATTING
-================================= */
+        // Display database articles before existing sample articles.
+        container.insertAdjacentHTML("afterbegin", userArticleHTML);
 
-function formatDate(date) {
+    } catch (error) {
 
-    return new Date(date).toLocaleDateString("en", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-    });
+        console.error("Unable to load articles:", error.message);
 
-}
-
-
-/* =================================
-   BASIC HTML ESCAPING
-================================= */
-
-function escapeHTML(value) {
-
-    return String(value).replace(/[&<>"']/g, function (character) {
-
-        const characters = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        };
-
-        return characters[character];
-
-    });
+    }
 
 }
